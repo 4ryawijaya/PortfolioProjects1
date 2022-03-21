@@ -1,0 +1,95 @@
+--Customer Table Only--
+SELECT * FROM customer_table
+;
+
+update customer_table set last_name='Pe', age=17
+where cust_id=2;
+
+update customer_table 
+set email_id='gee@xyz.com'
+where first_name='Gee'
+or first_name='gee';
+
+update customer_table set email_id =''
+
+delete from customer_table
+where cust_id=6;
+
+delete from customer_table
+where age >25;
+
+--SELECT * ROW_NUMBER () Over (PARTITION BY [column] ORDER BY [column]) as [row_number_name];--
+
+alter table customer_table
+add test varchar (255);
+
+alter table customer_table
+drop test;
+
+alter table customer_table
+drop column test;
+
+alter table customer_table
+rename column cust_id to customer_number;
+
+alter table customer_table
+rename column email_id to customer_email;
+
+alter table customer_table
+alter column last_name SET NOT NULL;
+
+insert into customer_table values (
+10,'lee', '',38, 'l@xyz.com');
+
+alter table customer_table
+alter column customer_number set not null;
+
+insert into customer_table (first_name, last_name, age, customer_email) values
+('aa', 'bb',25, 'ab@xyz.com');
+
+alter table customer_table
+alter column customer_number drop not null;
+
+alter table customer_table
+add constraint customer_number check (customer_number>0);
+
+insert into customer_table values
+(1,'tt','dd','69','td@xyz.com');
+
+--foreign and primary key--
+
+alter table customer_table add primary key (customer_number);
+
+delete from customer_table;
+
+
+--Task Classroom--
+select * from classroom;
+
+delete from classroom;
+
+Insert into classroom values 
+(1,'Donna',85), 
+(2,'Gregory', 75),
+(3,'David',65),
+(4,'Jarjit',78),
+(5,'Upin',86),
+(6,'Ipin',96),
+(7,'Mei',98),
+(8,'Dono',66),
+(9,'Danur',88),
+(10,'Robb',55),
+(11,'Popeye',98);
+
+Update classroom
+set science_marks=45
+where name='Popeye';
+
+delete from classroom
+where name='Robb';
+
+alter table classroom
+rename name to student_name;
+
+alter table classroom
+rename enrollment_no to student_id;
