@@ -1,0 +1,296 @@
+--DATA EXPLORATION1--
+
+--Portfolio 1--
+--query that fetch all entry on “inventory” table--
+select * from  inventory;
+
+--query that show all distinct film title from “film” table (no duplicate)--
+select distinct title from film;
+
+--all film with title that contain the word “Man” and “Woman” on the description from “film” table--
+select title, description from film
+WHERE description like '%Woman%'
+and description like'%Man%';
+
+--Count the number of movies for each rating group on “film” table--
+select count (rating) 
+from film
+where rating='PG-13';
+
+select count (rating) 
+from film
+where rating='G';
+
+select count (rating) 
+from film
+where rating='PG';
+
+select count (rating) 
+from film
+where rating='R';
+
+select count (rating)
+from film
+where rating='NC-17';
+
+select rating, 
+count(rating) as "total_film"
+from film
+group by rating;
+
+select count (*), 
+rating from film 
+group by rating;
+
+--Sort all film on “film” table based on length (duration)--
+select title, length from film
+order by length desc;
+
+select * from film order by length;
+
+--Find the average length of all film that has “Control” on its title--
+select length, title from film
+where title like '%Control%';
+
+Select avg (length) 
+from film
+where title like '%Control%';
+
+--all PG-13 movie with duration more that 120 minutes and rental rate more than 1--
+select title, rating, length, rental_rate from film
+where rating ='PG-13'
+and length >120
+and rental_rate >1
+order by rental_rate asc;
+
+select * from film 
+where (rating='PG-13') 
+and (length >120) 
+and (rental_rate >1);
+
+--Show all customer info and all their rental info (Join customer table with rental table)--
+select * from customer;
+select * from rental;
+
+select * from customer c
+inner join rental r on c.customer_id = r.customer_id;
+
+--Show the number of inventory of each film title (Join film table with inventory table, and COUNT the inventory ID--
+select * from film;
+select * from inventory;
+
+select * from film f
+inner join inventory i on f.film_id=i.film_id;
+
+--Create a 1 on 1 pair for every entry on ‘actor’ and ‘city’ table (cross join--
+select * from actor;
+select * from city;
+
+select * from city c
+cross join actor a;
+
+--HAVING, where tidak bisa digunakan untuk agregasi, maka dari itu kita gunakan HAVING--
+SELECT rating,MAX(length) FROM film
+GROUP BY rating
+HAVING MAX (length) > 160;
+
+--IN--
+Select
+from
+where in 
+
+--CASE--
+select title, length, 
+(case 
+when length >90 then 'Long'
+else 'short'
+end )
+from film; 
+
+--BETWEEN--
+select * from film 
+where length between (90) and (100);
+
+--String Manipulation, data text seperti coment, description, qualitative--
+select lower (title)
+from film;
+
+select concat (title,' ; ',description)
+from film;
+
+select replace ('Tulus','u','a')
+from film;
+
+--film category and category
+SELECT * FROM category a, film_category b
+WHERE a.category_id=b.category_id;
+
+--Create a query that will fetch a film (from “film”) with its language (“name” from “language”)
+SELECT title, a.language_id, name as language
+FROM film a
+INNER JOIN 
+language b
+on a.language_id=b.language_id
+LIMIT 50;
+
+--Create a query that will show every film and it’s category (Hint : combine “category”,”film_category”, and “film”)
+SELECT a.title, a.film_id, c.category_id, c.name as category 
+FROM film a
+INNER JOIN 
+film_category b on a.film_id=b.film_id
+INNER JOIN
+category c on b.category_id=c.category_id
+order by a.film_id;
+
+--Create a query that show all film with duration (length) more than 60 minutes and have english language
+SELECT a.title, a.length, a.language_id, b.name as language
+FROM film a
+INNER JOIN
+language b ON a.language_id=b.language_id
+WHERE length >60
+AND b.name='English'
+ORDER BY length ASC;
+
+SELECT title, length, b.name as language
+FROM film a, language b
+WHERE a.language_id = b.language_id
+and length>60
+and b.name='English';
+
+
+--Create a label for each film by its duration (<40 mnt is “Short”, >=40 mnt is “Long”) AS HANYA UNTUK MEMBERI ALIAS ATAU LABEL 
+SELECT title, length as duration,
+(CASE 
+ 	WHEN length <40 then'short'
+	ELSE 'long'
+END)
+FROM film
+ORDER BY 1;
+
+--Show all english language movie that has duration between 100 and 120 minutes
+--Option 1
+SELECT title, length, b.name as language
+FROM film a, language b
+WHERE a.language_id = b.language_id
+and length BETWEEN 100 AND 120
+and b.name='English';
+
+--Option 2
+SELECT f.title, f.length, l.name
+FROM film f
+INNER JOIN language l
+ON f.language_id=l.language_id
+where f.length between 100 and 120 and l.name='English'
+;
+
+--Find the length of shortest and longest film time 
+SELECT 
+MIN (length) as min_length, 
+MAX (length) as max_length
+FROM film;
+
+--Find how long since ‘Chamber Italian’ movie last updated 1	"English"	"2006-02-15 10:02:19"
+SELECT * FROM film
+WHERE title='Chamber Italian';
+
+SELECT (now()-last_update)
+FROM film
+WHERE title='Chamber Italian';
+
+--SUBQUERY--
+SELECT * FROM film;
+SELECT * FROM rental;
+SELECT * FROM staff;
+SELECT * FROM store;
+
+--DIFFERENCE BETWEEN EVERY FILM LENGTH FROM THE AVERAGE (SUBQUERRY ON SELECT)
+SELECT title,length, length-(SELECT AVG(length) 
+FROM film) AS diff_length
+FROM film;
+
+--AVERAGE OF TOP LENGTH 5 FILM (SUBQERY ON FROM)
+SELECT round (avg(a.length),1)
+FROM (SELECT title, length
+FROM film
+ORDER BY length DESC
+LIMIT 5) a
+;
+
+--FILM THAT IS LONGER THAN AVERAGE (SUBQUERRY ON WHERE)
+SELECT title, length
+FROM film
+WHERE length >(SELECT ROUND (AVG(length),1)
+FROM film)
+ORDER BY length ASC;
+
+--CTE COMMON TABLE EXPRESSION--
+--WTIH expression_name [(column_name[...n])] AS (CTE_query_definition)
+
+--CREATE A CTE THAT COUNT AVERAGE DURATION OF ALL MOVIE
+WITH avg_cte AS
+(SELECT AVG(length) AS avg from film)
+
+SELECT * 
+FROM avg_cte;
+
+--CREATE A CTE THAT SELECT RATING AND AVERAGE OF REPLACEMENT COST, THEN COMPARE THE AVERAGE TO EACH FILM'S REPLACEMENT_COST IN THE MAIN QUERY
+WITH reference AS
+(SELECT rating, ROUND(AVG(replacement_cost),2) AS average_cost from film
+group by rating)
+
+SELECT a.title, a.rating, a.replacement_cost, b.average_cost
+FROM film a
+LEFT JOIN
+reference b
+ON a.rating=b.rating
+;
+
+--USING QUERY ABOVE, LABEL FILM THAT HAS REPLACEMENT_COST HIGHER THAN AVERAGE AS EXPENSIVE, IF LOWER THEN CHEP, IF SAME THEN NORMAL
+WITH reference AS
+(SELECT rating, ROUND(AVG(replacement_cost),2) AS average_cost from film
+group by rating)
+
+SELECT a.title, a.rating, a.replacement_cost, b.average_cost,
+(CASE 
+ WHEN a.replacement_cost > b.average_cost then 'Expensive'
+ WHEN a.replacement_cost < b.average_cost then 'Cheap'
+ ELSE 'Normal'
+END) AS status
+FROM film a
+LEFT JOIN
+reference b
+ON a.rating=b.rating
+;
+
+--WINDOWS FUNCTION
+--SELECT [FUNCTION OR AGGREGATE] OVER ({PARTITION CLAUSE}[ORDER BY CLAUSE])
+--FUNGSI WINDOWS FUNCTION, CUMULATIVE SUM untuk menambahkan jumlah sesuai durasi tanggal yang berlaku, 
+
+SELECT title, rating, ROW_NUMBER()OVER(partition by rating) as rown
+from film;
+
+SELECT title, rating, RANK()OVER(partition by rating order by length) as ranked, length
+from film;
+
+SELECT title, rating, DENSE_RANK()OVER(partition by rating order by length) as ranked, length
+from film;
+
+--NTILE MENENTUKAN QUARTILE
+SELECT title, NTILE(10)OVER(ORDER BY length DESC), length
+FROM film;
+
+--NTH_VALUE
+SELECT title, NTH_VALUE(title,5)OVER(partition by rating),rating
+FROM film;
+
+--REGEX Regular EXPRESSION
+SELECT email FROM customer;
+
+SELECT SUBSTRING(email from '.+@(.+).org') FROM customer;
+
+SELECT title FROM film
+WHERE title ~'[a.b.]';
+
+
+
+
